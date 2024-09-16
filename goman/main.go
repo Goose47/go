@@ -2,6 +2,7 @@ package main
 
 import (
 	"Goose47/goman/internal/parser"
+	"Goose47/goman/internal/presenter"
 	"fmt"
 	"log"
 	"os"
@@ -23,13 +24,10 @@ func main() {
 
 	module, ok := modules[moduleName]
 	if !ok {
-		fmt.Println(fmt.Sprintf("Module %s is not found in standard library. :(", moduleName))
+		fmt.Println(presenter.GetModuleNotFound(moduleName))
 		return
 	}
-	fmt.Println(fmt.Sprintf("Package %s", module.Name))
-	fmt.Println(fmt.Sprintf("Documentation: %s%s", parser.BASE_URL, module.Uri))
-	fmt.Println(module.Description)
-	fmt.Println("---")
+	fmt.Println(presenter.GetModuleInfo(module))
 
 	if !withItem {
 		return
@@ -41,10 +39,5 @@ func main() {
 		return
 	}
 
-	fmt.Println(fmt.Sprintf("%s %s", item.Type, item.Name))
-	fmt.Println(item.Signature)
-	fmt.Println("---")
-	fmt.Println(item.Description)
-	fmt.Println(item.Example)
-	fmt.Println("---")
+	fmt.Println(presenter.GetItemInfo(*item))
 }

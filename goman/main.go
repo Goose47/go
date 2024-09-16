@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Goose47/goman/internal/client"
 	"Goose47/goman/internal/parser"
 	"Goose47/goman/internal/presenter"
 	"fmt"
@@ -15,7 +16,14 @@ func main() {
 		fmt.Println("Usage: package.FunctionName package/subpackage.TypeName")
 		return
 	}
-	modules, err := parser.GetStandardModules()
+
+	reader, err := client.CachedFetch("/std")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	modules, err := parser.GetStandardModules(reader)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,7 +52,13 @@ func main() {
 				return
 			}
 
-			item, err := parser.GetItem(module, itemName)
+			reader, err := client.CachedFetch(module.Uri)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			item, err := parser.GetItem(reader, itemName)
 			if err != nil {
 				fmt.Println(err)
 				return

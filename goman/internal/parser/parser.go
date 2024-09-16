@@ -4,21 +4,14 @@ import (
 	"Goose47/goman/internal/types"
 	"fmt"
 	"golang.org/x/net/html"
-	"net/http"
+	"io"
 )
 
-const BASE_URL = "https://pkg.go.dev"
-
-func GetStandardModules() (map[string]types.Module, error) {
-	res, err := http.Get(fmt.Sprintf("%s/std", BASE_URL))
+func GetStandardModules(from io.Reader) (map[string]types.Module, error) {
+	doc, err := html.Parse(from)
 	if err != nil {
 		return nil, err
 	}
-	doc, err := html.Parse(res.Body)
-	if err != nil {
-		return nil, err
-	}
-	res.Body.Close()
 
 	var nextModuleName string
 	modules := make(map[string]types.Module)
@@ -86,17 +79,11 @@ func GetStandardModules() (map[string]types.Module, error) {
 	return modules, nil
 }
 
-func GetItem(module types.Module, name string) (*types.Item, error) {
-	res, err := http.Get(fmt.Sprintf("%s/%s", BASE_URL, module.Uri))
+func GetItem(from io.Reader, name string) (*types.Item, error) {
+	doc, err := html.Parse(from)
 	if err != nil {
 		return nil, err
 	}
-
-	doc, err := html.Parse(res.Body)
-	if err != nil {
-		return nil, err
-	}
-	res.Body.Close()
 
 	var item types.Item
 	item.Name = name

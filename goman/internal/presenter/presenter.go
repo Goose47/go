@@ -1,7 +1,7 @@
 package presenter
 
 import (
-	"Goose47/goman/internal/parser"
+	"Goose47/goman/internal/client"
 	"Goose47/goman/internal/types"
 	"fmt"
 )
@@ -10,7 +10,7 @@ func GetModuleInfo(module types.Module) string {
 	return fmt.Sprintf(
 		"Package %s\nDocumentation: %s%s\n%s\n---",
 		module.Name,
-		parser.BASE_URL,
+		client.BASE_URL,
 		module.Uri,
 		module.Description,
 	)

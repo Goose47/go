@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 )
 
 func main() {
@@ -19,25 +20,43 @@ func main() {
 		log.Fatal(err)
 	}
 
-	next := os.Args[1]
-	moduleName, itemName, withItem := strings.Cut(next, ".")
+	var messages = make([]string, len(os.Args)-1)
+	var wg sync.WaitGroup
+	wg.Add(len(os.Args) - 1)
 
-	module, ok := modules[moduleName]
-	if !ok {
-		fmt.Println(presenter.GetModuleNotFound(moduleName))
-		return
+	for i := 0; i < len(os.Args)-1; i++ {
+		go func() {
+			defer wg.Done()
+			next := os.Args[i+1]
+			moduleName, itemName, withItem := strings.Cut(next, ".")
+
+			module, ok := modules[moduleName]
+			if !ok {
+				messages[i] = presenter.GetModuleNotFound(moduleName)
+				return
+			}
+
+			if len(os.Args) == 2 {
+				messages[i] = presenter.GetModuleInfo(module)
+			}
+
+			if !withItem {
+				return
+			}
+
+			item, err := parser.GetItem(module, itemName)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			messages[i] += "\n" + presenter.GetItemInfo(*item)
+		}()
 	}
-	fmt.Println(presenter.GetModuleInfo(module))
 
-	if !withItem {
-		return
+	wg.Wait()
+
+	for _, message := range messages {
+		fmt.Println(message)
 	}
-
-	item, err := parser.GetItem(module, itemName)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Println(presenter.GetItemInfo(*item))
 }

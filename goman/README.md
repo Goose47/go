@@ -5,11 +5,19 @@ Retrieves documentation of go standard from https://pkg.go.dev/ for a specified
 function/constant/type and displays its name, signature, description and usage
 example if present.
 
+Caches fetch results during one run. Uses goroutines to concurrently parse documentation.
+
 ## Installation
 ```
 $ go build .
 ```
+
 ## Usage
+```
+goman pkg.FunctionName pkg.TypeName pkg.ConstName
+```
+
+## Example
 ```
 $ goman fmt.Println
 Package fmt

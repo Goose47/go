@@ -1,23 +1,74 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"Goose47/storage/models"
+	"Goose47/storage/utils/repositories"
+	"errors"
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
+	"log"
+	"net/http"
+)
 
 type StorageController struct{}
 
+var storageRepository *repositories.StorageRepository
+
+func init() {
+	storageRepository = new(repositories.StorageRepository)
+}
+
 func (*StorageController) Get(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "Get",
+	key := c.Param("key")
+
+	item, err := storageRepository.FindByKey(key)
+
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": "Not Found",
+			})
+			return
+		}
+		log.Panic(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": fmt.Sprintf("Got %s", item.Key),
 	})
 }
 
 func (*StorageController) Set(c *gin.Context) {
+	key := c.Param("key")
+
+	id, err := storageRepository.Set(key, models.StorageItem{})
+
+	if err != nil {
+		log.Panic(err)
+	}
+
 	c.JSON(200, gin.H{
-		"message": "Set",
+		"message": fmt.Sprintf("Set %s", id),
 	})
 }
 
 func (*StorageController) Delete(c *gin.Context) {
+	key := c.Param("key")
+
+	item, err := storageRepository.DeleteByKey(key)
+
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": "Not Found",
+			})
+			return
+		}
+		log.Panic(err)
+	}
+
 	c.JSON(200, gin.H{
-		"message": "Delete",
+		"message": fmt.Sprintf("Deleted %v", item),
 	})
 }

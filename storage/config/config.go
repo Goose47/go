@@ -12,6 +12,10 @@ var AppConfig struct {
 	Port string
 }
 
+var DBConfig struct {
+	Url string
+}
+
 func Init() {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -21,6 +25,8 @@ func Init() {
 	AppConfig.Mode = checkAndRetrieve("APP_MODE")
 	AppConfig.Host = checkAndRetrieve("APP_HOST")
 	AppConfig.Port = checkAndRetrieve("APP_PORT")
+
+	DBConfig.Url = checkAndRetrieve("DB_URL")
 }
 
 func checkAndRetrieve(key string) string {

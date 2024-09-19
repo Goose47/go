@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"Goose47/storage/api/errs"
 	"Goose47/storage/models"
 	"Goose47/storage/utils/repositories"
 	"errors"
@@ -26,9 +27,7 @@ func (*StorageController) Get(c *gin.Context) {
 
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"message": "Not Found",
-			})
+			c.Error(&errs.NotFoundError{Message: fmt.Sprintf("%s is not found", key)})
 			return
 		}
 		log.Panic(err)
@@ -60,9 +59,7 @@ func (*StorageController) Delete(c *gin.Context) {
 
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"message": "Not Found",
-			})
+			c.Error(&errs.NotFoundError{Message: fmt.Sprintf("%s is not found", key)})
 			return
 		}
 		log.Panic(err)

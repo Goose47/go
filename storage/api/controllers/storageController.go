@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"mime/multipart"
@@ -49,7 +48,7 @@ func (*StorageController) Set(c *gin.Context) {
 	key := c.Param("key")
 
 	var form SetForm
-	if err := c.ShouldBindWith(&form, binding.Form); err != nil {
+	if err := c.ShouldBind(&form); err != nil {
 		c.JSON(422, gin.H{"message": err.Error()})
 		c.Abort()
 		return

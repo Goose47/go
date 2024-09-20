@@ -34,14 +34,21 @@ func (*StorageController) Get(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": fmt.Sprintf("Got %s", item.Key),
+		"message": fmt.Sprintf("Got %v", item),
 	})
 }
 
 func (*StorageController) Set(c *gin.Context) {
 	key := c.Param("key")
 
-	id, err := storageRepository.Set(key, models.StorageItem{})
+	item := &models.StorageItem{
+		Key:          key,
+		Path:         "path",
+		Ttl:          100,
+		OriginalName: "naem",
+	}
+
+	id, err := storageRepository.Set(item)
 
 	if err != nil {
 		log.Panic(err)

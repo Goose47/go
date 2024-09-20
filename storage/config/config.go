@@ -17,7 +17,7 @@ var DBConfig struct {
 }
 
 var FSConfig struct {
-	Path string
+	Base string
 }
 
 func Init() {
@@ -32,7 +32,7 @@ func Init() {
 
 	DBConfig.Url = checkAndRetrieve("DB_URL")
 
-	FSConfig.Path = checkAndRetrieve("STORAGE_PATH")
+	FSConfig.Base = checkAndRetrieve("STORAGE_PATH")
 }
 
 func checkAndRetrieve(key string) string {

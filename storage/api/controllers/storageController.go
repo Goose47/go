@@ -7,8 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
+	"mime/multipart"
 	"net/http"
 )
 
@@ -38,17 +40,26 @@ func (*StorageController) Get(c *gin.Context) {
 	})
 }
 
+type SetForm struct {
+	File *multipart.FileHeader `form:"file" binding:"required"`
+	Ttl  int                   `form:"ttl" binding:"required"`
+}
+
 func (*StorageController) Set(c *gin.Context) {
 	key := c.Param("key")
 
-	item := &models.StorageItem{
-		Key:          key,
-		Path:         "path",
-		Ttl:          100,
-		OriginalName: "naem",
+	var form SetForm
+	if err := c.ShouldBindWith(&form, binding.Form); err != nil {
+		c.JSON(422, gin.H{"message": err.Error()})
+		c.Abort()
+		return
 	}
 
-	id, err := storageRepository.Set(item)
+	id, err := storageRepository.Set(key, &models.StorageItem{
+		Path:         "path",
+		OriginalName: "orname",
+		Ttl:          form.Ttl,
+	})
 
 	if err != nil {
 		log.Panic(err)

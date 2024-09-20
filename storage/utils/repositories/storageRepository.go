@@ -23,10 +23,10 @@ func (*StorageRepository) FindByKey(key string) (*models.StorageItem, error) {
 	return createItem(result), nil
 }
 
-func (*StorageRepository) Set(item *models.StorageItem) (string, error) {
+func (*StorageRepository) Set(key string, item *models.StorageItem) (string, error) {
 	_, err := db.Client.Database("storage").
 		Collection("storage").
-		DeleteOne(context.TODO(), bson.D{{"_id", item.Key}})
+		DeleteOne(context.TODO(), bson.D{{"_id", key}})
 
 	if err != nil {
 		return "", err
@@ -35,7 +35,7 @@ func (*StorageRepository) Set(item *models.StorageItem) (string, error) {
 	result, err := db.Client.Database("storage").
 		Collection("storage").
 		InsertOne(context.TODO(), bson.D{
-			{"_id", item.Key},
+			{"_id", key},
 			{"path", item.Path},
 			{"ttl", item.Ttl},
 			{"originalName", item.OriginalName},

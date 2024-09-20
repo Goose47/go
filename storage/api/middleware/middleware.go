@@ -7,8 +7,6 @@ import (
 	"net/http"
 )
 
-func AcceptJson() {}
-
 func Handle404(c *gin.Context) {
 	c.Next()
 
@@ -16,7 +14,7 @@ func Handle404(c *gin.Context) {
 		var notFoundErr *errs.NotFoundError
 		if errors.As(err.Err, &notFoundErr) {
 			c.JSON(http.StatusNotFound, gin.H{
-				"message": notFoundErr.Message,
+				"message": notFoundErr.Error(),
 			})
 			c.Abort()
 			return

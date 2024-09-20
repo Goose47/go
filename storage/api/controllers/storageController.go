@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"Goose47/storage/api/errs"
-	"Goose47/storage/config"
 	"Goose47/storage/models"
 	"Goose47/storage/utils"
 	"Goose47/storage/utils/repositories"
@@ -13,6 +12,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"os"
 	"path"
 )
 
@@ -62,17 +62,13 @@ func (*StorageController) Set(c *gin.Context) {
 	item.Ttl = form.Ttl
 	item.Path = utils.GenerateRandomString(20) + path.Ext(form.File.Filename)
 
-	err := c.SaveUploadedFile(form.File, path.Join(config.FSConfig.Base, item.Path))
+	err := c.SaveUploadedFile(form.File, item.GetFullPath())
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
-	id, err := storageRepository.Set(key, &models.StorageItem{
-		Path:         "path",
-		OriginalName: "orname",
-		Ttl:          form.Ttl,
-	})
+	id, err := storageRepository.Set(key, item)
 
 	if err != nil {
 		log.Panic(err)
@@ -95,8 +91,11 @@ func (*StorageController) Delete(c *gin.Context) {
 		}
 		log.Panic(err)
 	}
+	if _, err = os.Stat(item.GetFullPath()); err == nil {
+		err = os.Remove(item.GetFullPath())
+	}
 
 	c.JSON(200, gin.H{
-		"message": fmt.Sprintf("Deleted %v", item),
+		"message": "ok",
 	})
 }

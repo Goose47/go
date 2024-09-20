@@ -37,9 +37,10 @@ func (*StorageController) Get(c *gin.Context) {
 		log.Panic(err)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": fmt.Sprintf("Got %v", item),
-	})
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Transfer-Encoding", "binary")
+	c.Header("Content-Disposition", "attachment; filename="+item.OriginalName)
+	c.File(item.GetFullPath())
 }
 
 type SetForm struct {

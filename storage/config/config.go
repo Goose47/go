@@ -16,6 +16,10 @@ var DBConfig struct {
 	Url string
 }
 
+var FSConfig struct {
+	Path string
+}
+
 func Init() {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -27,6 +31,8 @@ func Init() {
 	AppConfig.Port = checkAndRetrieve("APP_PORT")
 
 	DBConfig.Url = checkAndRetrieve("DB_URL")
+
+	FSConfig.Path = checkAndRetrieve("STORAGE_PATH")
 }
 
 func checkAndRetrieve(key string) string {

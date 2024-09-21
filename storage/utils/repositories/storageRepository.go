@@ -37,7 +37,7 @@ func (*StorageRepository) Set(key string, item *models.StorageItem) (string, err
 		InsertOne(context.TODO(), bson.D{
 			{"_id", key},
 			{"path", item.Path},
-			{"ttl", item.Ttl},
+			{"exp", item.Exp},
 			{"originalName", item.OriginalName},
 		})
 
@@ -67,7 +67,7 @@ func createItem(result map[string]interface{}) *models.StorageItem {
 
 	item.Key = result["_id"].(string)
 	item.Path = result["path"].(string)
-	item.Ttl = int(result["ttl"].(int32))
+	item.Exp = int(result["exp"].(int32))
 	item.OriginalName = result["originalName"].(string)
 
 	return item

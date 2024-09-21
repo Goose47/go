@@ -6,10 +6,10 @@ import (
 )
 
 type StorageItem struct {
-	Key          string
-	Ttl          int
-	Path         string
-	OriginalName string
+	Key          string `bson:"_id"`
+	Exp          int    `bson:"exp"`
+	Path         string `bson:"path"`
+	OriginalName string `bson:"originalName"`
 }
 
 func (i *StorageItem) GetFullPath() string {

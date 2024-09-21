@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"time"
 )
 
 type StorageController struct{}
@@ -59,8 +60,14 @@ func (*StorageController) Set(c *gin.Context) {
 
 	item := &models.StorageItem{}
 
+	// if exp == 0, document never expires
+	exp := form.Ttl
+	if exp > 0 {
+		exp += int(time.Now().Unix())
+	}
+
 	item.OriginalName = form.File.Filename
-	item.Ttl = form.Ttl
+	item.Exp = exp
 	item.Path = utils.GenerateRandomString(20) + path.Ext(form.File.Filename)
 
 	err := c.SaveUploadedFile(form.File, item.GetFullPath())
@@ -92,6 +99,7 @@ func (*StorageController) Delete(c *gin.Context) {
 		}
 		log.Panic(err)
 	}
+
 	if _, err = os.Stat(item.GetFullPath()); err == nil {
 		err = os.Remove(item.GetFullPath())
 	}

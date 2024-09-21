@@ -21,7 +21,7 @@ func checkExpiredItems() {
 	for {
 		time.Sleep(time.Second * 1)
 
-		cur, err := db.Client.Database("storage").Collection("storage").
+		cur, err := db.GetCollection().
 			Find(
 				context.TODO(),
 				bson.D{
@@ -58,7 +58,7 @@ func checkExpiredItems() {
 			ids[i] = r.Key
 		}
 
-		_, err = db.Client.Database("storage").Collection("storage").
+		_, err = db.GetCollection().
 			DeleteMany(
 				context.TODO(),
 				bson.D{{"_id", bson.D{{"$in", ids}}}},

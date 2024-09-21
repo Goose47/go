@@ -11,8 +11,7 @@ type StorageRepository struct{}
 
 func (*StorageRepository) FindByKey(key string) (*models.StorageItem, error) {
 	var result bson.M
-	err := db.Client.Database("storage").
-		Collection("storage").
+	err := db.GetCollection().
 		FindOne(context.TODO(), bson.D{{"_id", key}}).
 		Decode(&result)
 
@@ -24,8 +23,7 @@ func (*StorageRepository) FindByKey(key string) (*models.StorageItem, error) {
 }
 
 func (*StorageRepository) Set(key string, item *models.StorageItem) (string, error) {
-	result, err := db.Client.Database("storage").
-		Collection("storage").
+	result, err := db.GetCollection().
 		InsertOne(context.TODO(), bson.D{
 			{"_id", key},
 			{"path", item.Path},
@@ -42,8 +40,7 @@ func (*StorageRepository) Set(key string, item *models.StorageItem) (string, err
 
 func (*StorageRepository) DeleteByKey(key string) (*models.StorageItem, error) {
 	var result bson.M
-	err := db.Client.Database("storage").
-		Collection("storage").
+	err := db.GetCollection().
 		FindOneAndDelete(context.TODO(), bson.D{{"_id", key}}).
 		Decode(&result)
 

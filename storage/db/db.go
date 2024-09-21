@@ -12,6 +12,10 @@ import (
 
 var Client *mongo.Client
 
+func GetCollection() *mongo.Collection {
+	return Client.Database(config.DBConfig.DBName).Collection(config.DBConfig.DBColl)
+}
+
 func Init() {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()

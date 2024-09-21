@@ -13,7 +13,9 @@ var AppConfig struct {
 }
 
 var DBConfig struct {
-	Url string
+	Url    string
+	DBName string
+	DBColl string
 }
 
 var FSConfig struct {
@@ -31,6 +33,8 @@ func Init() {
 	AppConfig.Port = checkAndRetrieve("APP_PORT")
 
 	DBConfig.Url = checkAndRetrieve("DB_URL")
+	DBConfig.DBName = checkAndRetrieve("DB_NAME")
+	DBConfig.DBColl = checkAndRetrieve("DB_COLL")
 
 	FSConfig.Base = checkAndRetrieve("STORAGE_PATH")
 }

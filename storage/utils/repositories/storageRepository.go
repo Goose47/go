@@ -24,14 +24,6 @@ func (*StorageRepository) FindByKey(key string) (*models.StorageItem, error) {
 }
 
 func (*StorageRepository) Set(key string, item *models.StorageItem) (string, error) {
-	_, err := db.Client.Database("storage").
-		Collection("storage").
-		DeleteOne(context.TODO(), bson.D{{"_id", key}})
-
-	if err != nil {
-		return "", err
-	}
-
 	result, err := db.Client.Database("storage").
 		Collection("storage").
 		InsertOne(context.TODO(), bson.D{

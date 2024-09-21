@@ -2,8 +2,7 @@ package controllers
 
 import (
 	"Goose47/storage/api/errs"
-	"Goose47/storage/models"
-	"Goose47/storage/utils"
+	"Goose47/storage/api/services"
 	"Goose47/storage/utils/repositories"
 	"errors"
 	"fmt"
@@ -12,14 +11,12 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
-	"os"
-	"path"
-	"time"
 )
 
 type StorageController struct{}
 
 var storageRepository *repositories.StorageRepository
+var itemService *services.ItemService
 
 func init() {
 	storageRepository = new(repositories.StorageRepository)
@@ -58,28 +55,11 @@ func (*StorageController) Set(c *gin.Context) {
 		return
 	}
 
-	item := &models.StorageItem{}
+	id, err := itemService.Set(key, form.Ttl, form.File, c)
 
-	// if exp == 0, document never expires
-	exp := form.Ttl
-	if exp > 0 {
-		exp += int(time.Now().Unix())
-	}
-
-	item.OriginalName = form.File.Filename
-	item.Exp = exp
-	item.Path = utils.GenerateRandomString(20) + path.Ext(form.File.Filename)
-
-	err := c.SaveUploadedFile(form.File, item.GetFullPath())
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
-	}
-
-	id, err := storageRepository.Set(key, item)
-
-	if err != nil {
-		log.Panic(err)
 	}
 
 	c.JSON(200, gin.H{
@@ -90,7 +70,7 @@ func (*StorageController) Set(c *gin.Context) {
 func (*StorageController) Delete(c *gin.Context) {
 	key := c.Param("key")
 
-	item, err := storageRepository.DeleteByKey(key)
+	err := itemService.Delete(key)
 
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -98,10 +78,6 @@ func (*StorageController) Delete(c *gin.Context) {
 			return
 		}
 		log.Panic(err)
-	}
-
-	if _, err = os.Stat(item.GetFullPath()); err == nil {
-		err = os.Remove(item.GetFullPath())
 	}
 
 	c.JSON(200, gin.H{

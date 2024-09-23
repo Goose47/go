@@ -14,19 +14,18 @@ import (
 	"net/http"
 )
 
-type StorageController struct{}
-
-var storageRepository *repositories.StorageRepository
-var itemService *services.ItemService
-
-func init() {
-	storageRepository = repositories.NewStorageRepository(db.GetCollection())
+type StorageController struct {
+	repo *repositories.StorageRepository
 }
 
-func (*StorageController) Get(c *gin.Context) {
+func NewStorageController() *StorageController {
+	return &StorageController{repositories.NewStorageRepository(db.GetCollection())}
+}
+
+func (con *StorageController) Get(c *gin.Context) {
 	key := c.Param("key")
 
-	item, err := storageRepository.FindByKey(key)
+	item, err := con.repo.FindByKey(key)
 
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -44,10 +43,11 @@ func (*StorageController) Get(c *gin.Context) {
 
 type SetForm struct {
 	File *multipart.FileHeader `form:"file" binding:"required"`
-	Ttl  int                   `form:"ttl" binding:"required"`
+	Ttl  int                   `form:"ttl"`
 }
 
 func (*StorageController) Set(c *gin.Context) {
+	itemService := services.NewItemService()
 	key := c.Param("key")
 
 	var form SetForm
@@ -69,6 +69,7 @@ func (*StorageController) Set(c *gin.Context) {
 }
 
 func (*StorageController) Delete(c *gin.Context) {
+	itemService := services.NewItemService()
 	key := c.Param("key")
 
 	err := itemService.Delete(key)

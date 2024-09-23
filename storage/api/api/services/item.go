@@ -1,6 +1,7 @@
 package services
 
 import (
+	"Goose47/storage/db"
 	"Goose47/storage/models"
 	"Goose47/storage/utils"
 	"Goose47/storage/utils/repositories"
@@ -11,27 +12,27 @@ import (
 	"time"
 )
 
-var storageRepository *repositories.StorageRepository
-
-func init() {
-	storageRepository = new(repositories.StorageRepository)
+type ItemService struct {
+	repo *repositories.StorageRepository
 }
 
-type ItemService struct{}
+func NewItemService() *ItemService {
+	return &ItemService{repositories.NewStorageRepository(db.GetCollection())}
+}
 
-func (*ItemService) Set(
+func (service *ItemService) Set(
 	key string,
 	ttl int,
 	file *multipart.FileHeader,
 	c *gin.Context,
 ) (string, error) {
 	// Delete item and file if key exists
-	existingItem, err := storageRepository.FindByKey(key)
+	existingItem, err := service.repo.FindByKey(key)
 	if err == nil {
 		if err := storage.RemoveFileIfExists(existingItem.GetFullPath()); err != nil {
 			return "", err
 		}
-		if _, err := storageRepository.DeleteByKey(key); err != nil {
+		if _, err := service.repo.DeleteByKey(key); err != nil {
 			return "", err
 		}
 	}
@@ -52,15 +53,15 @@ func (*ItemService) Set(
 	}
 
 	var id string
-	if id, err = storageRepository.Set(key, item); err != nil {
+	if id, err = service.repo.Set(key, item); err != nil {
 		return "", err
 	}
 
 	return id, nil
 }
 
-func (*ItemService) Delete(key string) error {
-	item, err := storageRepository.DeleteByKey(key)
+func (service *ItemService) Delete(key string) error {
+	item, err := service.repo.DeleteByKey(key)
 
 	if err != nil {
 		return err

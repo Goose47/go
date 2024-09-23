@@ -14,7 +14,7 @@ func AddApiGroup(r *gin.Engine) {
 
 			storage := v1.Group("storage")
 			{
-				c := new(controllers.StorageController)
+				c := controllers.NewStorageController()
 				storage.GET("/:key", c.Get)
 				storage.POST("/:key", c.Set)
 				storage.DELETE("/:key", c.Delete)

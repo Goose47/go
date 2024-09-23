@@ -8,6 +8,6 @@ RUN go build -o app
 FROM alpine
 
 WORKDIR /app
-COPY --from=builder /app/main /build/app
+COPY --from=builder /app/app /build/app
 
-CMD ["./hello"]
+CMD ["./app"]

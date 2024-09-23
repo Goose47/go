@@ -3,6 +3,7 @@ package controllers
 import (
 	"Goose47/storage/api/errs"
 	"Goose47/storage/api/services"
+	"Goose47/storage/db"
 	"Goose47/storage/utils/repositories"
 	"errors"
 	"fmt"
@@ -19,7 +20,7 @@ var storageRepository *repositories.StorageRepository
 var itemService *services.ItemService
 
 func init() {
-	storageRepository = new(repositories.StorageRepository)
+	storageRepository = repositories.NewStorageRepository(db.GetCollection())
 }
 
 func (*StorageController) Get(c *gin.Context) {

@@ -1,17 +1,23 @@
 package repositories
 
 import (
-	"Goose47/storage/db"
 	"Goose47/storage/models"
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type StorageRepository struct{}
+type StorageRepository struct {
+	collection *mongo.Collection
+}
 
-func (*StorageRepository) FindByKey(key string) (*models.StorageItem, error) {
+func NewStorageRepository(collection *mongo.Collection) *StorageRepository {
+	return &StorageRepository{collection}
+}
+
+func (repo *StorageRepository) FindByKey(key string) (*models.StorageItem, error) {
 	var result bson.M
-	err := db.GetCollection().
+	err := repo.collection.
 		FindOne(context.TODO(), bson.D{{"_id", key}}).
 		Decode(&result)
 
@@ -22,8 +28,8 @@ func (*StorageRepository) FindByKey(key string) (*models.StorageItem, error) {
 	return createItem(result), nil
 }
 
-func (*StorageRepository) Set(key string, item *models.StorageItem) (string, error) {
-	result, err := db.GetCollection().
+func (repo *StorageRepository) Set(key string, item *models.StorageItem) (string, error) {
+	result, err := repo.collection.
 		InsertOne(context.TODO(), bson.D{
 			{"_id", key},
 			{"path", item.Path},
@@ -38,9 +44,9 @@ func (*StorageRepository) Set(key string, item *models.StorageItem) (string, err
 	return result.InsertedID.(string), nil
 }
 
-func (*StorageRepository) DeleteByKey(key string) (*models.StorageItem, error) {
+func (repo *StorageRepository) DeleteByKey(key string) (*models.StorageItem, error) {
 	var result bson.M
-	err := db.GetCollection().
+	err := repo.collection.
 		FindOneAndDelete(context.TODO(), bson.D{{"_id", key}}).
 		Decode(&result)
 

@@ -69,10 +69,7 @@ func checkExpiredItems() {
 			continue
 		}
 
-		//todo what is context.TODO()???
-		//todo OPENAPI SWAGGER
 		//todo README
 		//todo TESTS?
-		//todo DOCKER?
 	}
 }

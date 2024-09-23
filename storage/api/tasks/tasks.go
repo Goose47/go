@@ -69,9 +69,10 @@ func checkExpiredItems() {
 			continue
 		}
 
-		//todo move db.Client.Database("storage").Collection("storage") to config and function
 		//todo what is context.TODO()???
 		//todo OPENAPI SWAGGER
 		//todo README
+		//todo TESTS?
+		//todo DOCKER?
 	}
 }
